@@ -1,0 +1,53 @@
+  Docker Swarm Setup
+                                                       ================
+
+Rerequisites:
+============
+
+3 - Ubuntu Servers
+     1 - Master
+    2 - Workers
+   
+Steps:
+======
+         
+1) Install Docker Community Edition in all the 3 Servers.
+   And add user(ubuntu) to docker group.
+                
+   # Below command works for most of the Linux flavors except Redhat Linux
+   sudo curl -fsSL get.docker.com | /bin/bash
+  
+   # Add Current User to docker group.
+   sudo usermod -aG docker ${USER}
+  
+2) Open below ports in AWS Security Groups.
+      
+    TCP port 2377 for cluster management communications
+    TCP and UDP port 7946 for communication among nodes
+    UDP port 4789 for overlay network traffic.
+   
+    If you are planning on creating an overlay network with encryption     (--opt encrypted), you will  also need     to ensure ip protocol 50 (ESP) traffic is allowed.
+     
+3) Execute below command to initiate docker swarm manager in one system.
+  
+   # Initialize docker swarm cluster.
+   docker swarm init
+  
+   # Get worker token
+   docker swarm join-token worker
+  
+   # Get manager token to add another node as secondary manager
+   docker swarm join-token manager
+  
+4) Add workers machines to cluster.
+   #Execute join token(worker token from manager) in all worker machines.
+  
+  
+5) Display docker cluster nodes in manager machine.
+
+   docker node ls
+  
+6) Deploy Sample Docker Application in docker swarm cluster.
+
+    docker service create --name webserver --replicas 2 -p 80:80 httpd     
+  
